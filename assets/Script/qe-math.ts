@@ -46,6 +46,28 @@ export default class QEMath  {
     }
 
 
+    public static getWorldToLocalMatrixArray(sprite:cc.Sprite) : Float32Array{
+        let node = sprite.node
+        let mat4:any = cc.mat4()
+        node.getWorldMatrix(mat4)
+        mat4 = mat4.invert()    
+        let arr = new Float32Array(16);
+        for (let i=0;i<16;i++){
+            arr[i]= mat4.m[i]
+        }
+        let texture = sprite.spriteFrame.getTexture()
+        let tw = texture.width
+        let th = texture.height
+        //scale tw, th
+        arr[0] = arr[0] / tw
+        arr[1] = arr[1] / th
+        arr[4] = arr[4] / tw
+        arr[5] = arr[5] / th
+        arr[12] = arr[12] / tw
+        arr[13] = arr[13] / th
+        return arr
+    }
+
 
 }
 

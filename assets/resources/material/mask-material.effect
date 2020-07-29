@@ -1,0 +1,243 @@
+
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        mat_mask: {value:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]}
+  - passes:
+    - vert: vs_spine
+      frag: fs_spine
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        mat_mask: {value:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]}
+}%
+
+
+CCProgram vs %{
+  precision highp float;
+
+  #include <cc-global>
+  #include <cc-local>
+
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
+
+  in vec2 a_uv0;
+  out vec2 v_uv0;
+
+  #if QE_USE_MASK
+  out vec2 mask_uv0;
+  uniform MASK{
+      mediump mat4 mat_mask;
+  };
+  #endif
+
+  void main () {
+    vec4 pos = vec4(a_position, 1);
+
+    #if QE_USE_MASK
+      vec4 mask_pos;
+      #if CC_USE_MODEL
+      mask_pos = mat_mask * cc_matWorld * pos; 
+      #else
+      mask_pos = mat_mask  * pos; 
+      #endif
+      mask_uv0 = vec2(mask_pos.x+0.5, mask_pos.y+0.5);
+    #endif
+
+
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;
+    #endif
+
+ 
+    v_uv0 = a_uv0;
+
+    v_color = a_color;
+
+    gl_Position = pos;
+  }
+}%
+
+
+CCProgram fs %{
+  precision highp float;
+  
+
+  in vec4 v_color;
+
+  in vec2 v_uv0;
+
+
+  #if QE_USE_MASK
+  uniform sampler2D texture2;
+  in vec2 mask_uv0;
+  #endif 
+
+  uniform sampler2D texture;
+
+
+  void main () {
+    
+    vec4 o = vec4(1, 1, 1, 1);
+
+    o *= texture(texture, v_uv0);
+
+    #if CC_USE_ALPHA_ATLAS_TEXTURE
+    o.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+    #endif
+
+    o *= v_color;
+
+
+    #if QE_USE_MASK
+    o *= texture2D(texture2, mask_uv0).a;
+    #endif
+
+
+    gl_FragColor = o;
+  }
+}%
+
+
+
+CCProgram vs_spine %{
+  precision highp float;
+
+  #include <cc-global>
+  #include <cc-local>
+
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
+
+  in vec2 a_uv0;
+  out vec2 v_uv0;
+  out vec4 v_light;
+
+  #if USE_TINT
+  in vec4 a_color0;
+  in vec4 v_dark;
+  #endif
+
+
+  #if QE_USE_MASK
+  out vec2 mask_uv0;
+  uniform MASK{
+      mediump mat4 mat_mask;
+  };
+  #endif
+
+  void main () {
+
+
+    mat4 mvp;
+    #if CC_USE_MODEL
+        mvp = cc_matViewProj * cc_matWorld;
+    #else
+        mvp = cc_matViewProj;
+    #endif
+
+    vec4 pos = vec4(a_position, 1);
+    #if QE_USE_MASK
+      vec4 mask_pos;
+      #if CC_USE_MODEL
+      mask_pos = mat_mask * cc_matWorld * pos; 
+      #else
+      mask_pos = mat_mask  * pos; 
+      #endif
+      mask_uv0 = vec2(mask_pos.x+0.5, mask_pos.y+0.5);
+    #endif
+
+    v_uv0 = a_uv0;
+    v_light = a_color;
+    #if USE_TINT
+        v_dark = a_color0;
+    #endif
+    gl_Position = mvp * pos;
+   
+  }
+}%
+
+
+CCProgram fs_spine %{
+  precision highp float;
+  
+
+  in vec4 v_color;
+  in vec4 v_light;
+
+  in vec2 v_uv0;
+  uniform sampler2D texture;
+
+  
+  #if USE_TINT
+  in vec4 v_dark;
+  #endif
+
+  #if USE_ALPHA_TEST
+  uniform ALPHATHRESHOLD{
+       float alphaThreshold;
+  };
+  #endif
+
+  void ALPHA_TEST (vec4 color) {
+    #if USE_ALPHA_TEST
+        if (color.a < alphaThreshold) discard;
+    #endif
+  }
+  void ALPHA_TEST (float alpha) {
+      #if USE_ALPHA_TEST
+          if (alpha < alphaThreshold) discard;
+      #endif
+  }
+
+
+  #if QE_USE_MASK
+  uniform sampler2D texture2;
+  in vec2 mask_uv0;
+
+  #endif 
+
+  void main () {
+    vec4 texColor = texture2D(texture, v_uv0);
+    #if CC_USE_ALPHA_ATLAS_TEXTURE
+        texColor.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+    #endif
+    vec4 finalColor;
+    #if USE_TINT
+        finalColor.a = v_light.a * texColor.a;
+        finalColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
+    #else
+        finalColor = texColor * v_light;
+    #endif
+    ALPHA_TEST(finalColor);
+
+    #if QE_USE_MASK
+    vec4 mask =  texture2D(texture2, mask_uv0);
+    finalColor.rgb *= mask.a;
+    finalColor.a *= mask.a;
+    #endif
+    
+
+    gl_FragColor = finalColor;
+  }
+}%
+
+

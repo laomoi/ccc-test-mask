@@ -3,7 +3,7 @@ import QEMath from "./qe-math";
 const {ccclass, property} = cc._decorator;
 
 @ccclass
-export default class Helloworld extends cc.Component {
+export default class MaskStencilScene extends cc.Component {
 
     @property({type:cc.Mask, displayName:"遮罩节点"})
     protected heroMask:cc.Mask = null
