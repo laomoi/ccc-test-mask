@@ -49,22 +49,28 @@ export default class QEMath  {
     public static getWorldToLocalMatrixArray(sprite:cc.Sprite) : Float32Array{
         let node = sprite.node
         let mat4:any = cc.mat4()
+
+        //得到node的世界变换矩阵的逆矩阵
         node.getWorldMatrix(mat4)
         mat4 = mat4.invert()    
+        
+        //转换成着色器能接受的uniform格式Float32Array
         let arr = new Float32Array(16);
         for (let i=0;i<16;i++){
             arr[i]= mat4.m[i]
         }
+
         let texture = sprite.spriteFrame.getTexture()
         let tw = texture.width
         let th = texture.height
-        //scale tw, th
+
+        //做一下坐标转换，把uv坐标(x,y) 映射到[0， 1]的范围内
         arr[0] = arr[0] / tw
         arr[1] = arr[1] / th
         arr[4] = arr[4] / tw
         arr[5] = arr[5] / th
-        arr[12] = arr[12] / tw
-        arr[13] = arr[13] / th
+        arr[12] = arr[12] / tw + 0.5
+        arr[13] = arr[13] / th + 0.5
         return arr
     }
 

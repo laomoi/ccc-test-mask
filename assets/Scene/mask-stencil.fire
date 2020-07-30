@@ -687,8 +687,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 309.02,
-      "height": 50.4
+      "width": 154.51,
+      "height": 25.2
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -699,8 +699,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -11.117,
-        -139.752,
+        -6.353,
+        -44.466,
         0,
         0,
         0,
@@ -740,8 +740,8 @@
     "_useOriginalSize": false,
     "_string": "Using Stencil test",
     "_N$string": "Using Stencil test",
-    "_fontSize": 40,
-    "_lineHeight": 40,
+    "_fontSize": 20,
+    "_lineHeight": 20,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,

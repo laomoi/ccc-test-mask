@@ -758,8 +758,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 403.55,
-      "height": 50.4
+      "width": 172.32,
+      "height": 25.2
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -770,8 +770,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -11.117,
-        -166.75,
+        -12.705,
+        -57.172,
         0,
         0,
         0,
@@ -809,10 +809,10 @@
       }
     ],
     "_useOriginalSize": false,
-    "_string": "Using shader + texture",
-    "_N$string": "Using shader + texture",
-    "_fontSize": 40,
-    "_lineHeight": 40,
+    "_string": "Using alpha texture",
+    "_N$string": "Using alpha texture",
+    "_fontSize": 20,
+    "_lineHeight": 20,
     "_enableWrapText": true,
     "_N$file": null,
     "_isSystemFontUsed": true,

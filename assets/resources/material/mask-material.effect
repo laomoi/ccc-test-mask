@@ -56,7 +56,7 @@ CCProgram vs %{
       #else
       mask_pos = mat_mask  * pos; 
       #endif
-      mask_uv0 = vec2(mask_pos.x+0.5, mask_pos.y+0.5);
+      mask_uv0 = vec2(mask_pos.x, mask_pos.y);
     #endif
 
 
@@ -73,6 +73,7 @@ CCProgram vs %{
 
     gl_Position = pos;
   }
+  
 }%
 
 
@@ -162,7 +163,7 @@ CCProgram vs_spine %{
       #else
       mask_pos = mat_mask  * pos; 
       #endif
-      mask_uv0 = vec2(mask_pos.x+0.5, mask_pos.y+0.5);
+      mask_uv0 = vec2(mask_pos.x, mask_pos.y);
     #endif
 
     v_uv0 = a_uv0;
