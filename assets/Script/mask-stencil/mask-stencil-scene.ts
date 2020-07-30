@@ -1,4 +1,4 @@
-import QEMath from "./qe-math";
+import QEMath from "../qe-math";
 
 const {ccclass, property} = cc._decorator;
 
