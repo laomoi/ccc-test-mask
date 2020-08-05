@@ -11,6 +11,7 @@ export default class BeginMaskComp extends cc.Mask{
         if (maskAssembler == null) {
             return
         }
+        //js
         let oldFillBuffers = maskAssembler.fillBuffers
         maskAssembler.fillBuffers = function(mask, renderer) {
             if (self.isBeginMask) {
@@ -24,6 +25,14 @@ export default class BeginMaskComp extends cc.Mask{
                 oldPostFillBuffers.call(self, mask, renderer)
             } 
         }
+
+        //native
+        if (cc.sys.isNative) {
+            this._assembler.setBeginMask(this.isBeginMask)
+            this._assembler.setEndMask(!this.isBeginMask)
+        }
     }
+
+
 
 }
